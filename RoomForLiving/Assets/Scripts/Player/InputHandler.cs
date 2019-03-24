@@ -12,8 +12,6 @@ public class InputHandler : MonoBehaviour
     private Vector2 startFurniturePosition;
     private float startFurnitureRotation;
 
-    public float snapMoveThreshold;
-
     public enum InputState { Idle, Moving, Rotating}
     public InputState currentState;
 
@@ -23,7 +21,7 @@ public class InputHandler : MonoBehaviour
         gameCamera = GetComponent<Camera>();
     }
 
-    private void Update() {
+    private void FixedUpdate() {
         switch(currentState) {
             case InputState.Idle:
                 if (Input.GetMouseButtonDown(0)) {
@@ -35,11 +33,7 @@ public class InputHandler : MonoBehaviour
                 break;
             case InputState.Moving:
                 Vector2 goalPosition = startFurniturePosition + ((Vector2)gameCamera.ScreenToWorldPoint(Input.mousePosition) - startMouseWorldPosition);
-                if (Vector2.Distance(goalPosition, selectedFurniture.transform.position) >= snapMoveThreshold) {
-                    selectedFurniture.transform.position = goalPosition;
-                } else {
-                    selectedFurniture.GetComponent<Rigidbody2D>().MovePosition(goalPosition);
-                }
+                selectedFurniture.GetComponent<Rigidbody2D>().MovePosition(goalPosition);
                 break;
             case InputState.Rotating:
                 Vector2 a = startMouseWorldPosition - startFurniturePosition;
@@ -52,7 +46,7 @@ public class InputHandler : MonoBehaviour
                 if (cross.z > 0)
                     ang = 360 - ang;
                 
-                selectedFurniture.GetComponent<Rigidbody2D>().MoveRotation(-ang);
+                selectedFurniture.GetComponent<Rigidbody2D>().MoveRotation(startFurnitureRotation-ang);
                 break;
             default:
                 return;

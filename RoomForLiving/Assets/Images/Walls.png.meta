@@ -5,6 +5,7 @@ TextureImporter:
     21300000: Walls_0
     21300002: Walls_1
     21300004: Walls_2
+    21300006: Walls_3
   externalObjects: {}
   serializedVersion: 9
   mipmaps:
@@ -134,7 +135,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cb6ef86da9e75ee468c304b9c33e3964
+      spriteID: 7c7c8974616a1e54b976ae95c74e07b9
       vertices: []
       indices: 
       edges: []
@@ -154,7 +155,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2aab31ced3b6abf4b9e41bf45e2a6260
+      spriteID: 9fba8cf3eb77cb14c86f1bda1a4ef5b3
       vertices: []
       indices: 
       edges: []
@@ -174,7 +175,27 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cf2b6d5f12a2f374a8844454d08c2b5b
+      spriteID: 6b0c9786af398f545ba0c6ead31dba39
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walls_3
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2e050457b38674a40a3c575b788c39a9
       vertices: []
       indices: 
       edges: []
