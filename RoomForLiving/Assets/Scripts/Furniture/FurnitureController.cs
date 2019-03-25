@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class FurnitureController : MonoBehaviour
 {
-    private PolygonCollider2D selfCollider;
+    private List<PolygonCollider2D> selfColliders;
 
     private void Awake() {
-        selfCollider = GetComponentInChildren<PolygonCollider2D>();
+        selfColliders = new List<PolygonCollider2D>(GetComponentsInChildren<PolygonCollider2D>());
     }
 
     // Update is called once per frame
@@ -18,16 +18,18 @@ public class FurnitureController : MonoBehaviour
     }
 
     public bool IsFullyInside() {
-        foreach(Vector2 localPoint in selfCollider.points) {
-            Vector2 point = transform.TransformPoint(localPoint);
-            bool foundRoom = false;
-            foreach(RaycastHit2D hit in Physics2D.RaycastAll(point, Vector2.zero)) {
-                if(hit.collider.GetComponentInParent<RoomInsideIdentifier>() != null) {
-                    foundRoom = true;
+        foreach (PolygonCollider2D selfCollider in selfColliders) {
+            foreach (Vector2 localPoint in selfCollider.points) {
+                Vector2 point = selfCollider.transform.TransformPoint(localPoint);
+                bool foundRoom = false;
+                foreach (RaycastHit2D hit in Physics2D.RaycastAll(point, Vector2.zero)) {
+                    if (hit.collider.GetComponentInParent<RoomInsideIdentifier>() != null) {
+                        foundRoom = true;
+                    }
                 }
-            }
-            if(foundRoom == false) {
-                return false;
+                if (foundRoom == false) {
+                    return false;
+                }
             }
         }
         return true;

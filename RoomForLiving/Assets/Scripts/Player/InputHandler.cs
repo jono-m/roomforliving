@@ -5,15 +5,17 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(Camera))]
-public class InputHandler : MonoBehaviour
-{
+public class InputHandler : MonoBehaviour {
     private FurnitureController selectedFurniture;
-    private Vector2 startMouseWorldPosition;
-    private Vector2 startFurniturePosition;
-    private float startFurnitureRotation;
+    private Vector2 pullPosition;
 
-    public enum InputState { Idle, Moving, Rotating}
+    public float forceMultiplier;
+
+    public enum InputState { Idle, Moving }
     public InputState currentState;
+    
+    public Vector2 mousePosition;
+    public Vector2 pullWorldPosition;
 
     private Camera gameCamera;
 
@@ -22,37 +24,23 @@ public class InputHandler : MonoBehaviour
     }
 
     private void FixedUpdate() {
-        switch(currentState) {
+        switch (currentState) {
             case InputState.Idle:
                 if (Input.GetMouseButtonDown(0)) {
                     ActionState(InputState.Moving);
                 }
-                if(Input.GetMouseButtonDown(1)) {
-                    ActionState(InputState.Rotating);
-                }
                 break;
             case InputState.Moving:
-                Vector2 goalPosition = startFurniturePosition + ((Vector2)gameCamera.ScreenToWorldPoint(Input.mousePosition) - startMouseWorldPosition);
-                selectedFurniture.GetComponent<Rigidbody2D>().MovePosition(goalPosition);
-                break;
-            case InputState.Rotating:
-                Vector2 a = startMouseWorldPosition - startFurniturePosition;
-                Vector2 b = (Vector2)gameCamera.ScreenToWorldPoint(Input.mousePosition) - startFurniturePosition;
-
-                float ang = Vector2.Angle(a, b);
-
-                Vector3 cross = Vector3.Cross(a, b);
-
-                if (cross.z > 0)
-                    ang = 360 - ang;
-                
-                selectedFurniture.GetComponent<Rigidbody2D>().MoveRotation(startFurnitureRotation-ang);
+                mousePosition = gameCamera.ScreenToWorldPoint(Input.mousePosition);
+                pullWorldPosition = (Vector2)selectedFurniture.transform.TransformPoint(pullPosition);
+                Vector2 pullVector = mousePosition - pullWorldPosition;
+                selectedFurniture.GetComponent<Rigidbody2D>().AddForceAtPosition(forceMultiplier * pullVector / Time.fixedDeltaTime, pullWorldPosition);
                 break;
             default:
                 return;
         }
-        
-        if(!Input.GetMouseButton(0) && !Input.GetMouseButton(1)) {
+
+        if (!Input.GetMouseButton(0) && !Input.GetMouseButton(1)) {
             currentState = InputState.Idle;
         }
     }
@@ -60,23 +48,27 @@ public class InputHandler : MonoBehaviour
     private void ActionState(InputState nextState) {
         selectedFurniture = GetFurnitureUnderMouse();
         if (selectedFurniture != null) {
-            startMouseWorldPosition = GetComponent<Camera>().ScreenToWorldPoint(Input.mousePosition);
-            startFurniturePosition = selectedFurniture.transform.position;
-            startFurnitureRotation = selectedFurniture.transform.localEulerAngles.z;
+            pullPosition = selectedFurniture.transform.InverseTransformPoint(GetComponent<Camera>().ScreenToWorldPoint(Input.mousePosition));
             currentState = nextState;
         }
     }
 
     private FurnitureController GetFurnitureUnderMouse() {
-        if(EventSystem.current.IsPointerOverGameObject()) {
+        if (EventSystem.current.IsPointerOverGameObject()) {
             return null;
         }
-        foreach(RaycastHit2D hit in Physics2D.RaycastAll(gameCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero)) {
+        foreach (RaycastHit2D hit in Physics2D.RaycastAll(gameCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero)) {
             FurnitureController controller = hit.collider.GetComponentInParent<FurnitureController>();
-            if(controller != null) {
+            if (controller != null) {
                 return controller;
             }
         }
         return null;
+    }
+
+    private void OnDrawGizmos() {
+        if(currentState == InputState.Moving) {
+            Gizmos.DrawLine(selectedFurniture.transform.TransformPoint(pullPosition), mousePosition);
+        }
     }
 }
